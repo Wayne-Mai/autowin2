@@ -1,0 +1,10 @@
+{{ define "main" }}
+<article>
+  <h1>{{ .Title }}</h1>
+  <div class="meta">
+    {{ .Date.Format "January 2, 2006" }} · {{ .ReadingTime }} min read
+    {{ with .Params.tags }} · {{ delimit . ", " }}{{ end }}
+  </div>
+  {{ .Content }}
+</article>
+{{ end }}

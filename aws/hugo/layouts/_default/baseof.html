@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="{{ site.LanguageCode | default "en" }}">
+<head>
+{{ partial "head.html" . }}
+</head>
+<body>
+<div class="wrap">
+  <header class="site">
+    <a href="{{ "/" | relURL }}" class="brand">{{ site.Title }}</a>
+    <nav>
+      <a href="{{ "/" | relURL }}">Home</a>
+      <a href="{{ "/posts/" | relURL }}">All Posts</a>
+      <a href="{{ "/about/" | relURL }}">About</a>
+    </nav>
+  </header>
+  <main>
+    {{ block "main" . }}{{ end }}
+  </main>
+  <footer class="site">
+    &copy; {{ now.Year }} {{ site.Title }} · Written by {{ site.Params.author }}
+  </footer>
+</div>
+</body>
+</html>

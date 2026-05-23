@@ -1,0 +1,19 @@
+{{ define "main" }}
+{{ if .IsHome }}
+  <h1>{{ site.Title }}</h1>
+  <p class="lead">{{ site.Params.description }}</p>
+{{ else }}
+  <h1>{{ .Title }}</h1>
+  {{ with .Content }}<div>{{ . }}</div>{{ end }}
+{{ end }}
+
+<ul class="post-list">
+{{ range (where site.RegularPages "Section" "posts").ByDate.Reverse }}
+  <li>
+    <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+    <div class="meta">{{ .Date.Format "January 2, 2006" }} · {{ .ReadingTime }} min read</div>
+    {{ with .Params.description }}<div class="summary">{{ . }}</div>{{ end }}
+  </li>
+{{ end }}
+</ul>
+{{ end }}

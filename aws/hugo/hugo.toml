@@ -1,0 +1,17 @@
+baseURL = "https://marketingblogs.org/"
+languageCode = "en-us"
+title = "Marketing Blogs"
+# no theme — using local layouts/
+
+enableRobotsTXT = true
+enableEmoji = true
+
+[params]
+description = "Practical playbooks for SEO, content, email, growth, and brand."
+author = "Lucia Blog"
+
+[markup.goldmark.renderer]
+unsafe = true
+
+[outputs]
+home = ["HTML", "RSS"]

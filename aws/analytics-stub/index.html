@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Event collection and page-view ingestion endpoint for marketingblogs.org.">
+<meta name="robots" content="noindex,nofollow">
+<title>Marketing Blogs Analytics</title>
+<style>
+  :root {
+    --fg: #1a1a1a; --muted: #666; --bg: #fafafa;
+    --border: #e5e5e5; --link: #0066cc; --max: 720px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --fg: #e6e6e6; --muted: #999; --bg: #161616; --border: #2a2a2a; --link: #6aaaff; }
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 17px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.65; color: var(--fg); background: var(--bg); margin: 0; padding: 0;
+  }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  header.site { padding-bottom: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); }
+  header.site a.brand { font-weight: 700; font-size: 1.4rem; color: var(--fg); text-decoration: none; letter-spacing: -0.02em; }
+  header.site .tag { color: var(--muted); font-size: 0.85rem; margin-left: 0.4rem; font-weight: 500; }
+  h1 { font-size: 1.85rem; line-height: 1.2; margin: 0 0 0.5rem; letter-spacing: -0.02em; }
+  h2 { font-size: 1.2rem; margin-top: 2rem; letter-spacing: -0.01em; }
+  a { color: var(--link); }
+  p { margin: 1rem 0; }
+  .lead { font-size: 1.05rem; color: var(--muted); margin-bottom: 2rem; }
+  table { border-collapse: collapse; margin: 1rem 0; font-size: 0.95rem; width: 100%; }
+  th, td { text-align: left; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  td code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em; }
+  code { background: rgba(127,127,127,0.12); padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.92em; }
+  pre { background: rgba(127,127,127,0.08); padding: 0.9rem 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; }
+  pre code { background: none; padding: 0; }
+  footer.site { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="site">
+    <a href="https://marketingblogs.org/" class="brand">Marketing Blogs</a><span class="tag">/ analytics</span>
+  </header>
+  <main>
+    <h1>Analytics endpoint</h1>
+    <p class="lead">First-party event collection for <a href="https://marketingblogs.org/">marketingblogs.org</a>. This hostname only handles ingestion from the tracker snippet embedded on the main site &mdash; there's no reader-facing content here.</p>
+
+    <h2>Endpoints</h2>
+    <table>
+      <thead><tr><th>Path</th><th>Method</th><th>Returns</th></tr></thead>
+      <tbody>
+        <tr><td><code>/collect</code></td><td>POST</td><td>204 No Content</td></tr>
+        <tr><td><code>/event</code></td><td>POST</td><td>204 No Content</td></tr>
+        <tr><td><code>/healthz</code></td><td>GET</td><td>200 OK</td></tr>
+        <tr><td><code>/pixel.gif</code></td><td>GET</td><td>1&times;1 transparent GIF</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Tracker snippet</h2>
+    <p>Embedded in the main site's <code>&lt;head&gt;</code>:</p>
+<pre><code>&lt;script defer data-domain="marketingblogs.org"
+  src="https://analytics.marketingblogs.org/tracker.js"&gt;&lt;/script&gt;</code></pre>
+
+    <h2>Looking for the blog?</h2>
+    <p><a href="https://marketingblogs.org/">marketingblogs.org</a> &mdash; that's where the writing lives.</p>
+  </main>
+  <footer class="site">
+    Marketing Blogs Analytics &middot; ingest only &middot; <a href="https://marketingblogs.org/about/">About</a>
+  </footer>
+</div>
+</body>
+</html>
