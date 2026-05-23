@@ -1,2 +1,11 @@
 .humanize/
 .DS_Store
+
+# Harness benchmark local/generated artifacts.
+harness-benchmark/data/
+harness-benchmark/reports/
+harness-benchmark/**/*.sqlite
+harness-benchmark/**/*.sqlite-shm
+harness-benchmark/**/*.sqlite-wal
+harness-benchmark/**/__pycache__/
+harness-benchmark/**/*.pyc
