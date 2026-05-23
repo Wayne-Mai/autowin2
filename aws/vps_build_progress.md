@@ -177,6 +177,18 @@ CF Dashboard 默认会给 `localhost:8080` **自动补 `https://` 前缀**。
 
 ---
 
+## 客户端端到端验证 — ✅ 通过 (2026-05-24)
+
+| 测试 | 结果 |
+|---|---|
+| Mihomo Party 安装 + YAML 导入 | ✓ |
+| Mode = Global · GLOBAL group 选 sydney-vpn | ✓ |
+| Sys Proxy 开启,Mac 系统代理 = 127.0.0.1:7890 | ✓ |
+| `https://ipinfo.io/json` 显示出口 IP | **`52.64.70.157` (AWS Sydney)** ✓ |
+| 节点延迟 | 354ms(从 KAUST Saudi 出发,合理) |
+
+---
+
 ## 客户端连接信息(最终,apex 版)
 
 | 字段 | 值 |

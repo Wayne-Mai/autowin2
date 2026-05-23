@@ -1,0 +1,99 @@
+# =============================================================================
+# Sydney VPN — 中国出差配置
+# =============================================================================
+# 策略: "默认走代理,中国本地直连"(与 saudi.yaml 完全相反)
+# GFW 屏蔽的国外服务太多,白名单不现实,改用"反向 — 中国境内的直连"模式。
+# 用这套时通常你人在中国,所有国外服务都得绕过 GFW,只让本地中国服务走直连。
+
+# ---- Base ----
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: info
+ipv6: true
+
+dns:
+  enable: true
+  ipv6: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - '*.lan'
+    - localhost.ptlogin2.qq.com
+  # 中国境内时 DNS 必须用 DoH 绕过本地污染
+  nameserver:
+    - https://cloudflare-dns.com/dns-query
+    - https://dns.google/dns-query
+  fallback:
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
+  # 注:fake-ip 模式下,所有非中国域名都给一个假 IP,流量交给 Mihomo 在应用层解决,
+  # 这样彻底跳过中国 ISP 的 DNS 污染。
+
+# ---- Proxy nodes ----
+proxies:
+  - name: sydney-vpn
+    type: vless
+    server: marketingblogs.org
+    port: 443
+    uuid: dc4a1417-7ba3-4079-b40b-fd528ffebd9e
+    network: ws
+    tls: true
+    udp: true
+    servername: marketingblogs.org
+    client-fingerprint: chrome
+    skip-cert-verify: false
+    ws-opts:
+      path: /2f9a853f07e82681
+      headers:
+        Host: marketingblogs.org
+
+# ---- Proxy groups ----
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+      - sydney-vpn
+      - DIRECT          # 应急(CF 抽风时手动切直连,虽然 GFW 下大概率也不通)
+
+# ---- Rules ----
+# 顺序自上而下匹配。MATCH,PROXY 在底部 → 没匹配到任何中国直连规则的 = 全部走代理
+rules:
+  # === 本地网络 ===
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - GEOIP,LAN,DIRECT
+
+  # === 中国域名 / IP 直连(主体规则)===
+  - DOMAIN-SUFFIX,cn,DIRECT
+  - DOMAIN-SUFFIX,baidu.com,DIRECT
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,weixin.com,DIRECT
+  - DOMAIN-SUFFIX,wechat.com,DIRECT
+  - DOMAIN-SUFFIX,taobao.com,DIRECT
+  - DOMAIN-SUFFIX,tmall.com,DIRECT
+  - DOMAIN-SUFFIX,alibaba.com,DIRECT
+  - DOMAIN-SUFFIX,alipay.com,DIRECT
+  - DOMAIN-SUFFIX,jd.com,DIRECT
+  - DOMAIN-SUFFIX,bilibili.com,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.com,DIRECT
+  - DOMAIN-SUFFIX,douyin.com,DIRECT
+  - DOMAIN-SUFFIX,zhihu.com,DIRECT
+  - DOMAIN-SUFFIX,weibo.com,DIRECT
+  - DOMAIN-SUFFIX,xiaohongshu.com,DIRECT
+  - DOMAIN-SUFFIX,163.com,DIRECT
+  - DOMAIN-SUFFIX,126.com,DIRECT
+  - DOMAIN-SUFFIX,sina.com.cn,DIRECT
+  - DOMAIN-SUFFIX,sohu.com,DIRECT
+  - DOMAIN-SUFFIX,12306.cn,DIRECT
+  - DOMAIN-SUFFIX,gov.cn,DIRECT
+  - DOMAIN-SUFFIX,edu.cn,DIRECT
+
+  # 兜底:中国 IP 段直连(覆盖前面没列出的国内站)
+  - GEOIP,CN,DIRECT
+
+  # === 兜底:其他全部走代理 ===
+  - MATCH,PROXY
