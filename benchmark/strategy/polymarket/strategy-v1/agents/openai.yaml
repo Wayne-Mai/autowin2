@@ -1,0 +1,4 @@
+interface:
+  display_name: "Polymarket Crypto Interval Paper Strategy"
+  short_description: "Paper-only crypto interval strategy."
+  default_prompt: "Use this skill to implement or analyze the paper-only Polymarket crypto interval anchor/book-skew strategy with explicit filters, exits, and verifier-friendly flatness."

@@ -1,0 +1,33 @@
+optimistic:
+  description: Legacy maker proxy with no queue friction beyond the existing one-book wait.
+  maker_fill_mode: optimistic
+  maker_queue_ahead_fraction: 1.0
+  maker_queue_decay: 1.0
+  maker_fill_probability: 1.0
+  maker_max_order_age_attempts: 0
+  maker_cancel_on_price_move: false
+  maker_adverse_fill_on_price_move: false
+  maker_adverse_fill_fraction: 1.0
+
+realistic:
+  description: Queue proxy with moderate queue decay, order expiry, cancellation, and partial adverse fills.
+  maker_fill_mode: queue_proxy
+  maker_queue_ahead_fraction: 1.0
+  maker_queue_decay: 0.25
+  maker_fill_probability: 1.0
+  maker_max_order_age_attempts: 6
+  maker_cancel_on_price_move: true
+  maker_adverse_fill_on_price_move: true
+  maker_adverse_fill_fraction: 0.50
+
+pessimistic:
+  description: Slow queue proxy with deterministic probabilistic fills and stronger adverse selection.
+  maker_fill_mode: probabilistic_queue
+  maker_queue_ahead_fraction: 1.5
+  maker_queue_decay: 0.15
+  maker_fill_probability: 0.50
+  maker_seed: 17
+  maker_max_order_age_attempts: 4
+  maker_cancel_on_price_move: true
+  maker_adverse_fill_on_price_move: true
+  maker_adverse_fill_fraction: 1.0

@@ -9,4 +9,19 @@ harness-benchmark/**/*.sqlite-wal
 harness-benchmark/**/__pycache__/
 harness-benchmark/**/*.pyc
 
+# Nested benchmark artifacts.
+benchmark/polymarket/harness-benchmark/data/
+benchmark/polymarket/harness-benchmark/logs/
+benchmark/polymarket/harness-benchmark/**/*.sqlite
+benchmark/polymarket/harness-benchmark/**/*.sqlite-shm
+benchmark/polymarket/harness-benchmark/**/*.sqlite-wal
+benchmark/polymarket/harness-benchmark/**/__pycache__/
+benchmark/polymarket/harness-benchmark/**/*.pyc
+benchmark/polymarket/harness-benchmark/reports/*
+!benchmark/polymarket/harness-benchmark/reports/.gitkeep
+benchmark/polymarket/harness-benchmark/reports/*.plist
+benchmark/polymarket/harness-benchmark/reports/*.pid
+benchmark/polymarket/harness-benchmark/reports/*.label
+benchmark/polymarket/harness-benchmark/reports/*_last.*
+
 saudi.yaml
