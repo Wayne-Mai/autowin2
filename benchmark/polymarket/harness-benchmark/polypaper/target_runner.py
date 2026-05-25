@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import time
 from typing import Callable, List, Optional, Sequence
 
+from .engines import TradingEngine
 from .models import StrategyResult
 from .verification import TargetVerification, _strategy_family, verify_target_run
 
@@ -19,7 +20,7 @@ class TargetRunUntilResult:
 
 
 def run_until_target(
-    runner,
+    runner: TradingEngine,
     conn,
     run_id: str,
     strategy_names: Sequence[str],

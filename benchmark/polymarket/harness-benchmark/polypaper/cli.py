@@ -16,6 +16,7 @@ from .benchmark import (
 )
 from .client import PublicPolymarketClient, leaderboard_pages
 from .dashboard import serve_dashboard
+from .engines import paper_engine, replay_backtest_engine
 from .marketdata import order_book_from_clob, token_ids_from_market
 from .models import Quote, TraderTrade
 from .online_status import format_online_goal_status, online_goal_status_from_path
@@ -1009,7 +1010,13 @@ def _run_fixture(args) -> list:
         ),
         initial_cash=args.initial_cash,
     )
-    return simulator.run(trades, books)
+    engine = replay_backtest_engine(
+        simulator=simulator,
+        trades=trades,
+        quotes=books,
+        name="replay-fixture",
+    )
+    return engine.run_once()
 
 
 def _run_benchmark_suite(args):
@@ -1118,11 +1125,17 @@ def _run_target_replay_recording(args):
         initial_cash=args.initial_cash,
         collector=collector,
     )
+    engine = paper_engine(
+        runner,
+        name="recording-replay",
+        uses_live_market_data=False,
+        description="Recorded market snapshot replay through the paper execution engine.",
+    )
     strategy_names = [state.strategy.name for state in runner.agent_batch]
     max_cycles = args.max_cycles if args.max_cycles > 0 else len(recording.collections)
     upsert_paper_run(conn, run_id, "recording_replay", _run_metadata_config(args, strategy_names))
     result = run_until_target(
-        runner=runner,
+        runner=engine,
         conn=conn,
         run_id=run_id,
         strategy_names=strategy_names,
@@ -1147,9 +1160,10 @@ def _run_paper(args) -> tuple:
     run_id = args.run_id or f"paper-{int(time.time())}-{uuid4().hex[:8]}"
     client = PublicPolymarketClient()
     runner = _build_paper_runner(args, conn, run_id, client)
+    engine = paper_engine(runner, name="online-paper")
     strategy_names = [state.strategy.name for state in runner.agent_batch]
     upsert_paper_run(conn, run_id, "online_paper", _run_metadata_config(args, strategy_names))
-    results = runner.run(cycles=args.cycles, interval_seconds=args.interval_seconds)
+    results = engine.run(cycles=args.cycles, interval_seconds=args.interval_seconds)
     upsert_paper_run(conn, run_id, "online_paper", {"cycles_completed": args.cycles})
     return results, run_id
 
@@ -1204,11 +1218,12 @@ def _run_target_until(args):
     runner = _build_target_runner(args, conn, run_id, client)
     if args.resume:
         runner.resume_from_db()
+    engine = paper_engine(runner, name="online-target")
     strategy_names = [state.strategy.name for state in runner.agent_batch]
     upsert_paper_run(conn, run_id, "online_target", _run_metadata_config(args, strategy_names))
     resume_cycles, resume_elapsed = _resume_gate_offsets(conn, run_id) if args.resume else (0, 0.0)
     result = run_until_target(
-        runner=runner,
+        runner=engine,
         conn=conn,
         run_id=run_id,
         strategy_names=strategy_names,
@@ -1339,9 +1354,10 @@ def _run_sweep_target_until(args):
     sweep_results = _unique_sweep_assets(raw_sweep_results, args.sweep_strategies)
     if not sweep_results:
         runner = _build_sweep_target_runner(args, conn, run_id, client, [])
+        engine = paper_engine(runner, name="online-sweep-target")
         upsert_paper_run(conn, run_id, "online_sweep_target", _run_metadata_config(args, []))
         result = run_until_target(
-            runner=runner,
+            runner=engine,
             conn=conn,
             run_id=run_id,
             strategy_names=[],
@@ -1358,10 +1374,11 @@ def _run_sweep_target_until(args):
         )
         return result, sweep_results
     runner = _build_sweep_target_runner(args, conn, run_id, client, sweep_results)
+    engine = paper_engine(runner, name="online-sweep-target")
     strategy_names = [state.strategy.name for state in runner.agent_batch]
     upsert_paper_run(conn, run_id, "online_sweep_target", _run_metadata_config(args, strategy_names))
     result = run_until_target(
-        runner=runner,
+        runner=engine,
         conn=conn,
         run_id=run_id,
         strategy_names=strategy_names,

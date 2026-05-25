@@ -37,6 +37,10 @@ and persistence. `polypaper/simulator.py` owns fixture replay and shared fill
 rules. The legacy `polypaper.baselines` module remains as a compatibility import
 shim for older scripts.
 
+Backtest, paper trading, and future live trading are separated behind the shared
+engine interface in `polypaper/engines.py`. See `docs/ENGINE_ARCHITECTURE.md`
+for the engine contract and safety boundaries.
+
 ## Realism Boundaries
 
 The harness is for strategy and infrastructure benchmarking, not an absolute

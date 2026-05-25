@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
+from .engines import replay_backtest_engine
 from .models import OrderBook, Quote, StrategyResult, TraderTrade
 from .simulator import ConservativeFillModel, LatencyModel, MarketRules, PolymarketFeeModel, ReplaySimulator
 from .strategies.replay import replay_strategies_for_suite
@@ -126,7 +127,13 @@ def run_replay_benchmark(
             fill_model=fill_model,
             initial_cash=initial_cash,
         )
-        results_by_scenario[scenario.name] = simulator.run(trades, books)
+        engine = replay_backtest_engine(
+            simulator=simulator,
+            trades=trades,
+            quotes=books,
+            name=f"replay:{scenario.name}",
+        )
+        results_by_scenario[scenario.name] = engine.run_once()
     baseline = baseline_scenario or (scenarios[0].name if scenarios else "")
     rows = benchmark_summary_rows(results_by_scenario, baseline_scenario=baseline)
     return BenchmarkSuiteResult(
