@@ -39,6 +39,7 @@ DEFAULT_TARGET_VARIANTS = (
 )
 
 TARGET_VARIANT_GROUPS = (
+    "strategy_v1_selected",
     "online_goal_grid",
     "momentum_scalper_grid",
     "crypto_directional_grid",
@@ -53,6 +54,58 @@ DEFAULT_TARGET_VARIANTS_ARG = ",".join(DEFAULT_TARGET_VARIANTS)
 TARGET_VARIANT_HELP = (
     f"Comma-separated target variants: {', '.join(DEFAULT_TARGET_VARIANTS)}. "
     f"Expandable groups: {', '.join(TARGET_VARIANT_GROUPS)}"
+)
+
+STRATEGY_V1_ANCHOR_GRID_INDEXES = tuple(range(1, 25))
+STRATEGY_V1_BOOK_SKEW_GRID_INDEXES = (
+    1,
+    2,
+    4,
+    5,
+    7,
+    8,
+    10,
+    11,
+    13,
+    14,
+    16,
+    17,
+    19,
+    21,
+    22,
+    24,
+    25,
+    27,
+    28,
+    30,
+    31,
+    33,
+    34,
+    36,
+    37,
+    40,
+    43,
+    46,
+    49,
+    52,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
 )
 
 
@@ -1441,6 +1494,8 @@ def target_variant_configs(args) -> list:
 
 
 def _expanded_target_variant_group(args, name: str, base_configs: dict):
+    if name == "strategy_v1_selected":
+        return _strategy_v1_selected_grid(args, base_configs)
     if name == "momentum_scalper_grid":
         return _momentum_scalper_grid(args, base_configs["momentum_scalper_goal"])
     if name == "crypto_directional_grid":
@@ -1469,6 +1524,28 @@ def _expanded_target_variant_group(args, name: str, base_configs: dict):
             + _outcome_basket_arb_grid(args, base_configs["outcome_basket_arb_goal"])
         )
     return None
+
+
+def _strategy_v1_selected_grid(args, base_configs: dict) -> list:
+    anchor = _select_numbered_grid(
+        _crypto_interval_anchor_grid(args, base_configs["crypto_interval_anchor_goal"]),
+        "crypto_interval_anchor_grid",
+        STRATEGY_V1_ANCHOR_GRID_INDEXES,
+    )
+    book_skew = _select_numbered_grid(
+        _crypto_interval_book_skew_grid(args, base_configs["crypto_interval_book_skew_goal"]),
+        "crypto_interval_book_skew_grid",
+        STRATEGY_V1_BOOK_SKEW_GRID_INDEXES,
+    )
+    return anchor + book_skew
+
+
+def _select_numbered_grid(variants: list, prefix: str, indexes: tuple) -> list:
+    wanted = {f"{prefix}_{index:02d}" for index in indexes}
+    selected = [(name, config) for name, config in variants if name in wanted]
+    if len(selected) != len(wanted):
+        raise ValueError(f"strategy-v1 selection is out of sync for {prefix}")
+    return selected
 
 
 def _momentum_scalper_grid(args, base_config: dict) -> list:

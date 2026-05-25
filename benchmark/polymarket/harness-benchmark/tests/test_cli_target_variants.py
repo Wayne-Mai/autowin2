@@ -174,6 +174,26 @@ class CliTargetVariantTests(unittest.TestCase):
         self.assertEqual(micro["max_positions"], 3)
         self.assertEqual(micro["diversify_by"], "title_prefix")
 
+    def test_strategy_v1_selected_group_matches_final_report_families(self):
+        variants = target_variant_configs(target_args(target_variants="strategy_v1_selected"))
+        names = [name for name, _config in variants]
+
+        self.assertEqual(len(names), 72)
+        self.assertEqual(
+            sum(name.startswith("crypto_interval_anchor_grid_") for name in names),
+            24,
+        )
+        self.assertEqual(
+            sum(name.startswith("crypto_interval_book_skew_grid_") for name in names),
+            48,
+        )
+        self.assertEqual(names[0], "crypto_interval_anchor_grid_01")
+        self.assertEqual(names[23], "crypto_interval_anchor_grid_24")
+        self.assertEqual(names[24], "crypto_interval_book_skew_grid_01")
+        self.assertIn("crypto_interval_book_skew_grid_72", names)
+        self.assertNotIn("crypto_interval_anchor_grid_25", names)
+        self.assertNotIn("crypto_interval_book_skew_grid_03", names)
+
     def test_convex_tick_uses_low_price_high_movement_defaults(self):
         variants = dict(target_variant_configs(target_args(target_variants="convex_tick")))
 
